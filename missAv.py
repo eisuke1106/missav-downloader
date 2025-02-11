@@ -14,7 +14,7 @@ def getAvPageNumMax(path: str) -> int:
     return getMissAvTotalPageNum(path)
 
 
-def getAvTitleInfoAll(path: str, startPage: int = 1, lastPage: int = 1) -> list:
+def getAvTitleInfoAll(path: str, startPage: int = 1, lastPage: int = 1) -> list[AvInfo]:
     titleAllInfo = []
     # with ThreadPoolExecutor(max_workers=1) as executor:
 
@@ -92,10 +92,11 @@ def getM3U8(avInfo: AvInfo):
     avInfo.productCode = soup.find_all("span", text="品番:")[
         0
     ].next_sibling.next_sibling.text
-    actorElements = soup.find_all("span", text="女優:")[
-        0
-    ].previous_element.previous_element.find_all("a")
-    avInfo.actors = [actor.text for actor in actorElements]
+
+    actorElements = soup.find_all("span", text="女優:")
+    if actorElements:
+        actorElement = actorElements[0].previous_element.previous_element.find_all("a")
+        avInfo.actors = [actor.text for actor in actorElement]
 
     start = html.find("m3u8|")
     end = html.find("playlist|source") + len("playlist|source")
@@ -187,4 +188,3 @@ def dumpAvListToFile(avList: list):
         avList_json = json.dump(
             [av.to_dict() for av in avList], f, ensure_ascii=False, indent=4
         )
-        print(avList_json)

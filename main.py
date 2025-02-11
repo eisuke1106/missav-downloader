@@ -5,7 +5,7 @@ from missAv import (
     getM3U8List,
     dumpAvListToFile,
 )
-import json
+import downloader
 
 CAPTURE_DICT = {
     "無修正リーク": "dm620/ja/uncensored-leak",
@@ -16,7 +16,7 @@ CAPTURE_DICT = {
 
 
 async def main():
-    target = list(CAPTURE_DICT.values())[3]
+    target = list(CAPTURE_DICT.values())[0]
 
     totalPageNum = getAvPageNumMax(target)
     print(f"totalPageNum: {totalPageNum}")
@@ -25,10 +25,15 @@ async def main():
         return
 
     # テストで5ページまで取得
-    # totalPageNum = 5
+    totalPageNum = 1
     avList = getAvTitleInfoAll(target, 1, totalPageNum)
     getM3U8List(avList)
     dumpAvListToFile(avList)
+
+    for i in range(1, 3):
+        title = avList[i].title
+        url = avList[i].hls["source"]
+        downloader.download_stream(title, url)
 
 
 if __name__ == "__main__":
